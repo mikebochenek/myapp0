@@ -1,10 +1,10 @@
 package models
 
-type done struct {
-	id         int
-	owner      int
-	donetext   string
-	donedate   int
-	createdate int
-	deleted    bool
+type Done struct {
+	Id         int
+	Owner      int
+	Donetext   string
+	Donedate   int
+	Createdate int
+	Deleted    bool
 }
