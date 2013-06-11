@@ -16,8 +16,7 @@ type App struct {
 
 func (c App) Index() revel.Result {
 	now := time.Now()
-	greeting := ("Today is " + now.Format("Monday"))
-	greeting += (" " + now.Format(time.StampMicro) + "\n")
+	greeting := (now.Format("Monday") + " " + now.Format(time.StampMilli))
 
 	fmt.Println("-----------------------------------")
 
@@ -25,8 +24,6 @@ func (c App) Index() revel.Result {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
-	log.Printf(greeting)
 
 	rows, err := con.Query("select id, owner, donetext, donedate, createdate, deleted from done " +
 		"where deleted = false order by createdate")
@@ -40,6 +37,9 @@ func (c App) Index() revel.Result {
 		dones = append(dones, &models.Done{id, owner, donetext, donedate, createdate, deleted})
 		log.Printf("read: id=%d text=%s\n", dones[len(dones)-1].Id, dones[len(dones)-1].Donetext)
 	}
+
+	insertSQL := "insert into done (owner, donetext, donedate, createdate, deleted) values (?, ?, ?, ?, false)"
+	_, err = con.Exec(insertSQL, 1, greeting, time.Now().Unix(), time.Now().Unix())
 
 	defer con.Close()
 
