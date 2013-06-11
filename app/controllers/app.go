@@ -28,11 +28,17 @@ func (c App) Index() revel.Result {
 
 	log.Printf(greeting)
 
-	rows, err := con.Query("select id, owner, donetext, donedate from done where deleted = false order by createdate")
-	d := models.Done{}
+	rows, err := con.Query("select id, owner, donetext, donedate, createdate, deleted from done " +
+		"where deleted = false order by createdate")
+	dones := make([]*models.Done, 0, 10)
+	var id, owner, donedate, createdate int
+	var donetext string
+	var deleted bool
+
 	for rows.Next() {
-		err = rows.Scan(&d.Id, &d.Owner, &d.Donetext, &d.Donedate)
-		log.Printf("done read: id=%d len=%d\n", d.Id, len(d.Donetext))
+		err = rows.Scan(&id, &owner, &donetext, &donedate, &createdate, &deleted)
+		dones = append(dones, &models.Done{id, owner, donetext, donedate, createdate, deleted})
+		log.Printf("read: id=%d text=%s\n", dones[len(dones)-1].Id, dones[len(dones)-1].Donetext)
 	}
 
 	defer con.Close()
